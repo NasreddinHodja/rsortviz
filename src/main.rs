@@ -1,5 +1,4 @@
 use nannou::prelude::*;
-use sort::BubbleSorter;
 
 mod sort;
 use sort::*;
@@ -9,14 +8,14 @@ const WINDOW_WIDTH: u32 = 800;
 const BG_COLOR: Rgb<u8> = BLACK;
 const FG_COLOR: Rgb<u8> = PLUM;
 const FFG_COLOR: Rgb<u8> = RED;
-const LEN: usize = 10;
+const LEN: usize = 100;
 
 struct Model<T: Sorter> {
     playing: bool,
     sorter: T,
 }
 
-type CurrentSorter = BubbleSorter;
+type CurrentSorter = SelectionSorter;
 
 fn model(app: &App) -> Model<CurrentSorter> {
     app.new_window()
@@ -25,7 +24,7 @@ fn model(app: &App) -> Model<CurrentSorter> {
         .build()
         .unwrap();
 
-    app.set_loop_mode(LoopMode::rate_fps(2.0));
+    // app.set_loop_mode(LoopMode::rate_fps(2.0));
 
     let playing = false;
     let v: Vec<usize> = (1..=LEN).collect();
@@ -93,9 +92,9 @@ fn view(app: &App, model: &Model<CurrentSorter>, frame: Frame) {
 fn main() {
     nannou::app(model).update(update).event(event).run();
 
-    // let v: Vec<usize> = (0..LEN).collect();
+    // let v: Vec<usize> = (1..=LEN).collect();
 
-    // let v = unsort(&v);
+    // let mut v = unsort(&v);
     // let mut sorter = CurrentSorter::new(&v);
 
     // println!("v = {v:?}\n");
