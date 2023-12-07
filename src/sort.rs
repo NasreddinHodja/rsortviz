@@ -70,28 +70,4 @@ impl Sorter for BubbleSorter {
         self.values = self.step_result.clone();
         Some(self.step_result.clone())
     }
-
-    // fn next_step(&mut self) -> Option<Vec<usize>> {
-    //     if self.current_step >= self.values.len() {
-    //         return None;
-    //     }
-
-    //     let mut result = self.values.to_vec();
-    //     let mut swapped = false;
-
-    //     for i in 1..self.values.len() - self.current_step {
-    //         if result[i] < result[i - 1] {
-    //             result.swap(i, i - 1);
-    //             swapped = true;
-    //         }
-    //     }
-
-    //     if !swapped {
-    //         return None;
-    //     }
-
-    //     self.values = result.clone();
-    //     self.current_step += 1;
-    //     Some(result)
-    // }
 }
