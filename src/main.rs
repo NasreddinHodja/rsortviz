@@ -8,7 +8,8 @@ const WINDOW_HEIGHT: u32 = 800;
 const WINDOW_WIDTH: u32 = 800;
 const BG_COLOR: Rgb<u8> = BLACK;
 const FG_COLOR: Rgb<u8> = PLUM;
-const LEN: usize = 500;
+const FFG_COLOR: Rgb<u8> = RED;
+const LEN: usize = 10;
 
 struct Model<T: Sorter> {
     playing: bool,
@@ -78,10 +79,12 @@ fn view(app: &App, model: &Model<CurrentSorter>, frame: Frame) {
         let bar_height = v[i] as f32 * win.w() / LEN as f32;
         let x = -win.w() / 2.0 + bar_width / 2.0 + i as f32 * bar_width;
         let y = -win.h() / 2.0 + bar_height / 2.0;
-        draw.rect()
-            .x_y(x, y)
-            .w_h(bar_width, bar_height)
-            .color(FG_COLOR);
+        let draw = draw.rect().x_y(x, y).w_h(bar_width, bar_height);
+        if model.sorter.used_indices().contains(&i) {
+            draw.color(FFG_COLOR);
+        } else {
+            draw.color(FG_COLOR);
+        }
     }
 
     draw.to_frame(app, &frame).unwrap();
@@ -91,13 +94,19 @@ fn main() {
     nannou::app(model).update(update).event(event).run();
 
     // let v: Vec<usize> = (0..LEN).collect();
-    // let v: Vec<usize> = vec![0, 2, 1, 4, 3];
 
-    // let v = sort::unsort(&v);
-    // let sorter = CurrentSorter::new(&v);
+    // let v = unsort(&v);
+    // let mut sorter = CurrentSorter::new(&v);
 
     // println!("v = {v:?}\n");
-    // for (step_num, step) in sorter.enumerate() {
-    //     println!("{step_num} -> {step:?}");
+    // let mut i = 0;
+    // loop {
+    //     sorter.next_step();
+    //     println!("{i} -> {:?}", sorter.current_state());
+    //     if let Some(step) = sorter.next_step() {
+    //         i += 1;
+    //     } else {
+    //         break;
+    //     }
     // }
 }
