@@ -15,7 +15,7 @@ struct Model<T: Sorter> {
     sorter: T,
 }
 
-type CurrentSorter = SelectionSorter;
+type CurrentSorter = MergeSorter;
 
 fn model(app: &App) -> Model<CurrentSorter> {
     app.new_window()
@@ -93,19 +93,23 @@ fn main() {
     nannou::app(model).update(update).event(event).run();
 
     // let v: Vec<usize> = (1..=LEN).collect();
+    // // let v: Vec<usize> = vec![1, 3, 4, 2, 5];
 
-    // let mut v = unsort(&v);
+    // let v = unsort(&v);
+    // // sort::merge_sort(&mut v);
+    // // println!("{:?}", v);
     // let mut sorter = CurrentSorter::new(&v);
 
     // println!("v = {v:?}\n");
     // let mut i = 0;
     // loop {
     //     sorter.next_step();
-    //     println!("{i} -> {:?}", sorter.current_state());
+    //     // println!("{i} -> {:?}", sorter.current_state());
     //     if let Some(step) = sorter.next_step() {
     //         i += 1;
     //     } else {
     //         break;
     //     }
     // }
+    // println!("result = {:?}", &sorter.current_state());
 }
