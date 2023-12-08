@@ -10,7 +10,7 @@ const WINDOW_WIDTH: u32 = 800;
 const BG_COLOR: Rgb<u8> = BLACK;
 const FG_COLOR: Rgb<u8> = PLUM;
 const FFG_COLOR: Rgb<u8> = RED;
-const MAX_HZ: f64 = 440.0;
+const MAX_HZ: f64 = 200.0;
 const LEN: usize = 100;
 
 struct Audio {
@@ -24,7 +24,7 @@ struct Model<T: Sorter> {
     stream: audio::Stream<Audio>,
 }
 
-type CurrentSorter = MergeSorter;
+type CurrentSorter = InsertionSorter;
 
 fn audio(audio: &mut Audio, buffer: &mut Buffer) {
     let sample_rate = buffer.sample_rate() as f64;
@@ -143,18 +143,17 @@ fn main() {
     nannou::app(model).update(update).event(event).run();
 
     // let v: Vec<usize> = (1..=LEN).collect();
-    // // let v: Vec<usize> = vec![1, 3, 4, 2, 5];
 
-    // let v = unsort(&v);
-    // // sort::merge_sort(&mut v);
+    // let mut v = unsort(&v);
+    // println!("v = {v:?}\n");
+    // // sort::insertion_sort(&mut v);
     // // println!("{:?}", v);
     // let mut sorter = CurrentSorter::new(&v);
 
-    // println!("v = {v:?}\n");
     // let mut i = 0;
     // loop {
     //     sorter.next_step();
-    //     // println!("{i} -> {:?}", sorter.current_state());
+    //     println!("{i} -> {:?}", sorter.current_state());
     //     if let Some(step) = sorter.next_step() {
     //         i += 1;
     //     } else {

@@ -27,6 +27,59 @@ pub trait Sorter {
     fn used_indices(&self) -> Vec<usize>;
 }
 
+pub struct InsertionSorter {
+    step_result: Vec<usize>,
+    i: usize,
+    j: usize,
+}
+
+impl Sorter for InsertionSorter {
+    fn new(values: &[usize]) -> Self {
+        Self {
+            step_result: values.to_vec(),
+            i: 1,
+            j: 1,
+        }
+    }
+
+    fn current_state(&self) -> &[usize] {
+        &self.step_result
+    }
+
+    fn used_indices(&self) -> Vec<usize> {
+        vec![self.j]
+    }
+
+    fn next_step(&mut self) -> Option<Vec<usize>> {
+        let len = self.step_result.len();
+
+        if self.i >= len {
+            return None;
+        }
+
+        if self.j > 0 && self.step_result[self.j - 1] > self.step_result[self.j] {
+            self.step_result.swap(self.j - 1, self.j);
+            self.j -= 1;
+        } else {
+            self.i += 1;
+            self.j = self.i;
+        }
+
+        Some(self.step_result.clone())
+    }
+}
+
+pub fn insertion_sort(values: &mut [usize]) {
+    let len = values.len();
+    for i in 1..len {
+        let mut j = i;
+        while j > 0 && values[j - 1] > values[j] {
+            values.swap(j - 1, j);
+            j -= 1;
+        }
+    }
+}
+
 pub struct MergeSorter {
     step_result: Vec<usize>,
     left: Vec<usize>,
@@ -135,53 +188,52 @@ impl Sorter for MergeSorter {
     }
 }
 
-#[allow(dead_code)]
-pub fn merge_sort(arr: &mut [usize]) {
-    let len = arr.len();
-    let mut current_size = 1;
-    while current_size <= len - 1 {
-        let mut start = 0;
-        while start < len - 1 {
-            let mid = min(start + current_size - 1, len - 1);
-            let end = min(start + 2 * current_size - 1, len - 1);
+// pub fn merge_sort(arr: &mut [usize]) {
+//     let len = arr.len();
+//     let mut current_size = 1;
+//     while current_size <= len - 1 {
+//         let mut start = 0;
+//         while start < len - 1 {
+//             let mid = min(start + current_size - 1, len - 1);
+//             let end = min(start + 2 * current_size - 1, len - 1);
 
-            let left = (&arr[start..mid + 1]).to_vec();
-            let right = (&arr[mid + 1..end + 1]).to_vec();
+//             let left = (&arr[start..mid + 1]).to_vec();
+//             let right = (&arr[mid + 1..end + 1]).to_vec();
 
-            let mut i = 0;
-            let mut j = 0;
-            let mut k = start;
+//             let mut i = 0;
+//             let mut j = 0;
+//             let mut k = start;
 
-            while i < left.len() && j < right.len() {
-                if left[i] < right[j] {
-                    arr[k] = left[i];
-                    k += 1;
-                    i += 1;
-                } else {
-                    arr[k] = right[j];
-                    k += 1;
-                    j += 1;
-                }
-            }
+//             while i < left.len() && j < right.len() {
+//                 if left[i] < right[j] {
+//                     arr[k] = left[i];
+//                     k += 1;
+//                     i += 1;
+//                 } else {
+//                     arr[k] = right[j];
+//                     k += 1;
+//                     j += 1;
+//                 }
+//             }
 
-            while i < left.len() {
-                arr[k] = left[i];
-                k += 1;
-                i += 1;
-            }
+//             while i < left.len() {
+//                 arr[k] = left[i];
+//                 k += 1;
+//                 i += 1;
+//             }
 
-            while j < right.len() {
-                arr[k] = right[j];
-                k += 1;
-                j += 1;
-            }
+//             while j < right.len() {
+//                 arr[k] = right[j];
+//                 k += 1;
+//                 j += 1;
+//             }
 
-            start += 2 * current_size;
-        }
+//             start += 2 * current_size;
+//         }
 
-        current_size *= 2;
-    }
-}
+//         current_size *= 2;
+//     }
+// }
 
 pub struct SelectionSorter {
     step_result: Vec<usize>,
