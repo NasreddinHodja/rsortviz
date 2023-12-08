@@ -124,7 +124,7 @@ fn view(app: &App, model: &Model<CurrentSorter>, frame: Frame) {
         let draw = draw.rect().x_y(x, y).w_h(bar_width, bar_height);
         if model.sorter.used_indices().contains(&i) {
             draw.color(FFG_COLOR);
-            let hz = i as f64 * MAX_HZ / LEN as f64;
+            let hz = model.sorter.current_state()[i] as f64 * MAX_HZ / LEN as f64;
             model
                 .stream
                 .send(move |audio| {
