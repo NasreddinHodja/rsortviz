@@ -71,7 +71,7 @@ impl Sorter for MergeSorter {
     }
 
     fn used_indices(&self) -> Vec<usize> {
-        vec![self.i, self.j, self.k]
+        vec![self.start + self.i, self.mid + self.j, self.k]
     }
 
     fn next_step(&mut self) -> Option<Vec<usize>> {
@@ -135,6 +135,7 @@ impl Sorter for MergeSorter {
     }
 }
 
+#[allow(dead_code)]
 pub fn merge_sort(arr: &mut [usize]) {
     let len = arr.len();
     let mut current_size = 1;

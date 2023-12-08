@@ -1,4 +1,6 @@
 use nannou::prelude::*;
+use nannou_audio as audio;
+use nannou_audio::Buffer;
 
 mod sort;
 use sort::*;
@@ -8,14 +10,34 @@ const WINDOW_WIDTH: u32 = 800;
 const BG_COLOR: Rgb<u8> = BLACK;
 const FG_COLOR: Rgb<u8> = PLUM;
 const FFG_COLOR: Rgb<u8> = RED;
+const MAX_HZ: f64 = 440.0;
 const LEN: usize = 100;
+
+struct Audio {
+    phase: f64,
+    hz: f64,
+}
 
 struct Model<T: Sorter> {
     playing: bool,
     sorter: T,
+    stream: audio::Stream<Audio>,
 }
 
 type CurrentSorter = MergeSorter;
+
+fn audio(audio: &mut Audio, buffer: &mut Buffer) {
+    let sample_rate = buffer.sample_rate() as f64;
+    let volume = 0.5;
+    for frame in buffer.frames_mut() {
+        let sine_amp = (2.0 * PI as f64 * audio.phase).sin() as f32;
+        audio.phase += audio.hz / sample_rate;
+        audio.phase %= sample_rate;
+        for channel in frame {
+            *channel = sine_amp * volume;
+        }
+    }
+}
 
 fn model(app: &App) -> Model<CurrentSorter> {
     app.new_window()
@@ -26,17 +48,38 @@ fn model(app: &App) -> Model<CurrentSorter> {
 
     // app.set_loop_mode(LoopMode::rate_fps(2.0));
 
+    let audio_host = audio::Host::new();
+    let model = Audio {
+        phase: 0.0,
+        hz: 0.0,
+    };
+    let stream = audio_host
+        .new_output_stream(model)
+        .render(audio)
+        .build()
+        .unwrap();
+    stream.play().unwrap();
+
     let playing = false;
     let v: Vec<usize> = (1..=LEN).collect();
     let v = unsort(&v);
     let sorter = CurrentSorter::new(&v);
 
-    Model { playing, sorter }
+    Model {
+        playing,
+        sorter,
+        stream,
+    }
 }
 
 fn update(_app: &App, model: &mut Model<CurrentSorter>, _update: Update) {
     if model.playing {
-        step(model)
+        step(model);
+        if model.stream.is_paused() {
+            model.stream.play().unwrap();
+        }
+    } else if model.stream.is_playing() {
+        let _ = model.stream.pause();
     }
 }
 
@@ -81,6 +124,13 @@ fn view(app: &App, model: &Model<CurrentSorter>, frame: Frame) {
         let draw = draw.rect().x_y(x, y).w_h(bar_width, bar_height);
         if model.sorter.used_indices().contains(&i) {
             draw.color(FFG_COLOR);
+            let hz = i as f64 * MAX_HZ / LEN as f64;
+            model
+                .stream
+                .send(move |audio| {
+                    audio.hz = hz;
+                })
+                .unwrap();
         } else {
             draw.color(FG_COLOR);
         }
