@@ -11,7 +11,7 @@ const BG_COLOR: Rgb<u8> = BLACK;
 const FG_COLOR: Rgb<u8> = PLUM;
 const FFG_COLOR: Rgb<u8> = RED;
 const MAX_HZ: f64 = 440.0;
-const LEN: usize = 10;
+const LEN: usize = 100;
 
 struct Audio {
     phase: f64,
@@ -24,7 +24,7 @@ struct Model<T: Sorter> {
     stream: audio::Stream<Audio>,
 }
 
-type CurrentSorter = MergeSorter;
+type CurrentSorter = InsertionSorter;
 
 fn audio(audio: &mut Audio, buffer: &mut Buffer) {
     let sample_rate = buffer.sample_rate() as f64;
