@@ -1,5 +1,5 @@
 # rsortviz
-Visualizer for sorting algorithms using [[https://nannou.cc/][nannou]].
+Visualizer for sorting algorithms using [nannou](https://nannou.cc/).
 
 Algorithms:
 + [X] [bubble sort](https://en.wikipedia.org/wiki/Bubble_sort)
