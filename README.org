@@ -1,0 +1,10 @@
+#+title: Readme
+
+* README
+Visualizer for sorting algorithms using [[https://nannou.cc/][nannou]].
+
+Algorithms:
++ [ ] [[https://en.wikipedia.org/wiki/Bubble_sort][bubble sort]]
++ [ ] [[https://en.wikipedia.org/wiki/Insertion_sort][insertion sort]]
++ [ ] [[https://en.wikipedia.org/wiki/Merge_sort][selection sort]]
++ [ ] [[https://en.wikipedia.org/wiki/Quicksort][quicksort]]
