@@ -10,8 +10,8 @@ const WINDOW_WIDTH: u32 = 800;
 const BG_COLOR: Rgb<u8> = BLACK;
 const FG_COLOR: Rgb<u8> = PLUM;
 const FFG_COLOR: Rgb<u8> = RED;
-const MAX_HZ: f64 = 200.0;
-const LEN: usize = 100;
+const MAX_HZ: f64 = 440.0;
+const LEN: usize = 10;
 
 struct Audio {
     phase: f64,
@@ -24,7 +24,7 @@ struct Model<T: Sorter> {
     stream: audio::Stream<Audio>,
 }
 
-type CurrentSorter = InsertionSorter;
+type CurrentSorter = MergeSorter;
 
 fn audio(audio: &mut Audio, buffer: &mut Buffer) {
     let sample_rate = buffer.sample_rate() as f64;
@@ -58,7 +58,6 @@ fn model(app: &App) -> Model<CurrentSorter> {
         .render(audio)
         .build()
         .unwrap();
-    stream.play().unwrap();
 
     let playing = false;
     let v: Vec<usize> = (1..=LEN).collect();
@@ -122,6 +121,7 @@ fn view(app: &App, model: &Model<CurrentSorter>, frame: Frame) {
         let x = -win.w() / 2.0 + bar_width / 2.0 + i as f32 * bar_width;
         let y = -win.h() / 2.0 + bar_height / 2.0;
         let draw = draw.rect().x_y(x, y).w_h(bar_width, bar_height);
+
         if model.sorter.used_indices().contains(&i) {
             draw.color(FFG_COLOR);
             let hz = model.sorter.current_state()[i] as f64 * MAX_HZ / LEN as f64;
@@ -145,9 +145,10 @@ fn main() {
     // let v: Vec<usize> = (1..=LEN).collect();
 
     // let mut v = unsort(&v);
+    // let end = v.len() - 1;
     // println!("v = {v:?}\n");
-    // // sort::insertion_sort(&mut v);
-    // // println!("{:?}", v);
+    // sort::quick_sort(&mut v);
+    // println!("{:?}", v);
     // let mut sorter = CurrentSorter::new(&v);
 
     // let mut i = 0;

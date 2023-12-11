@@ -69,17 +69,6 @@ impl Sorter for InsertionSorter {
     }
 }
 
-pub fn insertion_sort(values: &mut [usize]) {
-    let len = values.len();
-    for i in 1..len {
-        let mut j = i;
-        while j > 0 && values[j - 1] > values[j] {
-            values.swap(j - 1, j);
-            j -= 1;
-        }
-    }
-}
-
 pub struct MergeSorter {
     step_result: Vec<usize>,
     left: Vec<usize>,
