@@ -87,6 +87,9 @@ fn model(app: &App) -> Model {
 
 fn update(_app: &App, model: &mut Model, _update: Update) {
     if model.playing {
+        if !model.stream.is_playing() {
+            model.stream.play().unwrap();
+        }
         if let Ok(Some(result)) = model.rx.recv() {
             model.v = result.values;
             model.used_indices = result.used_indices;
