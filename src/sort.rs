@@ -48,15 +48,16 @@ pub fn bubble_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
         for j in 0..len - i - 1 {
             if values[j] > values[j + 1] {
                 values.swap(j, j + 1);
-                send_message(&tx, values, &[j, j + 1]);
+                swapped = true;
             }
+            send_message(&tx, values, &[j, j + 1]);
         }
 
         if !swapped {
             break;
         }
     }
-    tx.send(None).unwrap();
+    send_message(&tx, values, &[]);
 }
 
 pub fn insertion_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
@@ -179,7 +180,7 @@ pub fn quicksort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
 
         for j in low..high - 1 {
             if values[j] <= pivot {
-                send_message(&tx, values, &[low + i, low + j, pivot_index]);
+                send_message(&tx, values, &[i, j, pivot_index]);
                 values.swap(i, j);
                 i += 1;
             }
@@ -218,17 +219,17 @@ fn max_heapify(values: &mut [usize], i: usize, heap_size: usize, tx: &Sender<Opt
 
     if left < heap_size && values[left] > values[largest] {
         largest = left;
-        send_message(&tx, values, &[left, right, largest]);
+        send_message(&tx, values, &[left, right, largest, i]);
     }
 
     if right < heap_size && values[right] > values[largest] {
         largest = right;
-        send_message(&tx, values, &[left, right, largest]);
+        send_message(&tx, values, &[left, right, largest, i]);
     }
 
     if largest != i {
         values.swap(i, largest);
-        send_message(&tx, values, &[left, right, largest]);
+        send_message(&tx, values, &[left, right, largest, i]);
         max_heapify(values, largest, heap_size, &tx);
     }
 }
@@ -243,8 +244,8 @@ pub fn shell_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
             let mut j = i;
             while j >= gap && values[j - gap] > values[j] {
                 values.swap(j - gap, j);
+                send_message(&tx, values, &[j, j - gap]);
                 j -= gap;
-                send_message(&tx, values, &[gap, i, j]);
             }
         }
 
@@ -269,7 +270,7 @@ pub fn radix_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
 }
 
 fn counting_sort(values: &mut [usize], exp: usize, tx: &Sender<Option<SortResult>>) {
-    let mut output = vec![0; values.len()];
+    let mut output = values.to_vec();
     let mut count = vec![0; 10];
 
     for &num in values.iter() {
@@ -284,7 +285,7 @@ fn counting_sort(values: &mut [usize], exp: usize, tx: &Sender<Option<SortResult
         let index = (num / exp) % 10;
         output[count[index] - 1] = num;
         count[index] -= 1;
-        send_message(&tx, values, &[index]);
+        send_message(&tx, &output, &[count[index]]);
     }
 
     values.copy_from_slice(&output);
