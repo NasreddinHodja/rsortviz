@@ -1,5 +1,7 @@
-use rand::Rng;
+use rand::{seq::SliceRandom, Rng};
 use std::sync::mpsc::Sender;
+use std::thread;
+use std::time;
 
 pub fn unsort(values: &[usize]) -> Vec<usize> {
     let mut rng = rand::thread_rng();
@@ -41,7 +43,7 @@ pub fn bubble_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
                 values.swap(j, j + 1);
                 tx.send(Some(SortResult {
                     values: values.to_vec(),
-                    used_indices: vec![i, j],
+                    used_indices: vec![i, j, j + 1],
                 }))
                 .unwrap();
             }
@@ -132,7 +134,7 @@ pub fn merge_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
                     values[k] = left[i];
                     tx.send(Some(SortResult {
                         values: values.to_vec(),
-                        used_indices: vec![i, j, k],
+                        used_indices: vec![i + start, j + mid, k],
                     }))
                     .unwrap();
                     k += 1;
@@ -141,7 +143,7 @@ pub fn merge_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
                     values[k] = right[j];
                     tx.send(Some(SortResult {
                         values: values.to_vec(),
-                        used_indices: vec![i, j, k],
+                        used_indices: vec![i + start, j + mid, k],
                     }))
                     .unwrap();
                     k += 1;
@@ -153,7 +155,7 @@ pub fn merge_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
                 values[k] = left[i];
                 tx.send(Some(SortResult {
                     values: values.to_vec(),
-                    used_indices: vec![i, j, k],
+                    used_indices: vec![i + start, j + mid, k],
                 }))
                 .unwrap();
                 k += 1;
@@ -164,7 +166,7 @@ pub fn merge_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
                 values[k] = right[j];
                 tx.send(Some(SortResult {
                     values: values.to_vec(),
-                    used_indices: vec![i, j, k],
+                    used_indices: vec![i + start, j + mid, k],
                 }))
                 .unwrap();
                 k += 1;
@@ -223,4 +225,62 @@ pub fn quicksort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
     }))
     .unwrap();
     tx.send(None).unwrap();
+}
+
+pub fn heap_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
+    tx.send(Some(SortResult {
+        values: values.to_vec(),
+        used_indices: vec![],
+    }))
+    .unwrap();
+
+    // Build a max heap from the values
+    for i in (0..values.len() / 2).rev() {
+        max_heapify(values, i, values.len(), &tx);
+    }
+
+    // Extract elements from the heap one by one
+    for end in (1..values.len()).rev() {
+        values.swap(0, end);
+        max_heapify(values, 0, end, &tx);
+        tx.send(Some(SortResult {
+            values: values.to_vec(),
+            used_indices: vec![end],
+        }))
+        .unwrap();
+    }
+}
+
+fn max_heapify(values: &mut [usize], i: usize, heap_size: usize, tx: &Sender<Option<SortResult>>) {
+    let left = 2 * i + 1;
+    let right = 2 * i + 2;
+    let mut largest = i;
+
+    if left < heap_size && values[left] > values[largest] {
+        largest = left;
+        tx.send(Some(SortResult {
+            values: values.to_vec(),
+            used_indices: vec![left, right, largest],
+        }))
+        .unwrap();
+    }
+
+    if right < heap_size && values[right] > values[largest] {
+        largest = right;
+        tx.send(Some(SortResult {
+            values: values.to_vec(),
+            used_indices: vec![left, right, largest],
+        }))
+        .unwrap();
+    }
+
+    if largest != i {
+        values.swap(i, largest);
+        tx.send(Some(SortResult {
+            values: values.to_vec(),
+            used_indices: vec![left, right, largest],
+        }))
+        .unwrap();
+        max_heapify(values, largest, heap_size, &tx);
+    }
 }
