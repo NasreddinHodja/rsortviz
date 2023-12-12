@@ -70,10 +70,10 @@ fn model(app: &App) -> Model {
     // insertion_sort(&mut v, tx);
     // selection_sort(&mut v, tx);
     // merge_sort(&mut v, tx);
-    // quicksort(&mut v, tx);
+    quicksort(&mut v, tx);
     // heap_sort(&mut v, tx);
     // shell_sort(&mut v, tx);
-    radix_sort(&mut v, tx);
+    // radix_sort(&mut v, tx);
 
     match rx.recv().unwrap() {
         Some(result) => v = result.values,

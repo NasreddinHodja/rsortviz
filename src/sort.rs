@@ -1,7 +1,7 @@
-use rand::{seq::SliceRandom, Rng};
+#![allow(dead_code)]
+
+use rand::Rng;
 use std::sync::mpsc::Sender;
-use std::thread;
-use std::time;
 
 pub fn unsort(values: &[usize]) -> Vec<usize> {
     let mut rng = rand::thread_rng();
