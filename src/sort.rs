@@ -96,87 +96,101 @@ pub fn selection_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
 
 pub fn merge_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
     send_message(&tx, values, &[]);
-
     let len = values.len();
-    let mut current_size = 1;
-    while current_size <= len - 1 {
-        let mut start = 0;
-        while start < len - 1 {
-            let mid = min(start + current_size - 1, len - 1);
-            let end = min(start + 2 * current_size - 1, len - 1);
+    if len <= 1 {
+        return;
+    }
+    let mut temp = values.to_vec();
 
-            let left = (&values[start..mid + 1]).to_vec();
-            let right = (&values[mid + 1..end + 1]).to_vec();
+    merge_sort_helper(values, &mut temp, 0, len - 1, &tx);
+}
 
-            let mut i = 0;
-            let mut j = 0;
-            let mut k = start;
+fn merge_sort_helper(
+    values: &mut [usize],
+    temp: &mut [usize],
+    start: usize,
+    end: usize,
+    tx: &Sender<Option<SortResult>>,
+) {
+    if start < end {
+        let mid = (start + end) / 2;
 
-            while i < left.len() && j < right.len() {
-                if left[i] < right[j] {
-                    values[k] = left[i];
-                    send_message(&tx, values, &[i + start, j + mid, k]);
-                    k += 1;
-                    i += 1;
-                } else {
-                    values[k] = right[j];
-                    send_message(&tx, values, &[i + start, j + mid, k]);
-                    k += 1;
-                    j += 1;
-                }
-            }
+        merge_sort_helper(values, temp, start, mid, &tx);
+        merge_sort_helper(values, temp, mid + 1, end, &tx);
 
-            while i < left.len() {
-                values[k] = left[i];
-                send_message(&tx, values, &[i + start, j + mid, k]);
-                k += 1;
-                i += 1;
-            }
+        merge(values, temp, start, mid, end, &tx);
+    }
+}
 
-            while j < right.len() {
-                values[k] = right[j];
-                send_message(&tx, values, &[i + start, j + mid, k]);
-                k += 1;
-                j += 1;
-            }
+fn merge(
+    values: &mut [usize],
+    temp: &mut [usize],
+    start: usize,
+    mid: usize,
+    end: usize,
+    tx: &Sender<Option<SortResult>>,
+) {
+    let (mut i, mut j, mut k) = (start, mid + 1, start);
 
-            start += 2 * current_size;
+    while i <= mid && j <= end {
+        if values[i] <= values[j] {
+            temp[k] = values[i];
+            i += 1;
+        } else {
+            temp[k] = values[j];
+            j += 1;
         }
-
-        current_size *= 2;
+        k += 1;
+        send_message(&tx, temp, &[i, j, k]);
     }
 
-    tx.send(None).unwrap();
+    while i <= mid {
+        temp[k] = values[i];
+        i += 1;
+        k += 1;
+        send_message(&tx, temp, &[i, j, k]);
+    }
+
+    while j <= end {
+        temp[k] = values[j];
+        j += 1;
+        k += 1;
+        send_message(&tx, temp, &[i, j, k]);
+    }
+
+    for i in start..=end {
+        values[i] = temp[i];
+    }
 }
 
 pub fn quicksort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
     send_message(&tx, values, &[]);
     let mut stack = vec![(0, values.len())];
 
-    while let Some((lo, hi)) = stack.pop() {
-        if hi - lo <= 1 {
+    while let Some((low, high)) = stack.pop() {
+        if high - low <= 1 {
             continue;
         }
-        let pivot_index = lo + (hi - lo) / 2;
-        values.swap(pivot_index, hi - 1);
+        let pivot_index = low + (high - low) / 2;
+        values.swap(pivot_index, high - 1);
 
-        let pivot = values[hi - 1];
-        let mut i = lo;
+        let pivot = values[high - 1];
+        let mut i = low;
 
-        for j in lo..hi - 1 {
+        for j in low..high - 1 {
             if values[j] <= pivot {
-                send_message(&tx, values, &[i, j, pivot_index]);
+                send_message(&tx, values, &[low + i, low + j, pivot_index]);
                 values.swap(i, j);
                 i += 1;
             }
         }
 
-        values.swap(i, hi - 1);
+        values.swap(i, high - 1);
 
         let pivot_index = i;
 
-        stack.push((pivot_index + 1, hi));
-        stack.push((lo, pivot_index));
+        stack.push((pivot_index + 1, high));
+        stack.push((low, pivot_index));
     }
 
     send_message(&tx, values, &[]);
