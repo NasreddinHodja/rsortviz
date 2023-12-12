@@ -12,7 +12,7 @@ const BG_COLOR: Rgb<u8> = BLACK;
 const FG_COLOR: Rgb<u8> = PLUM;
 const FFG_COLOR: Rgb<u8> = RED;
 const MAX_HZ: f64 = 440.0;
-const LEN: usize = 10;
+const LEN: usize = 100;
 
 struct Audio {
     phase: f64,
@@ -69,8 +69,8 @@ fn model(app: &App) -> Model {
     // bubble_sort(&mut v, tx);
     // insertion_sort(&mut v, tx);
     // selection_sort(&mut v, tx);
-    // merge_sort(&mut v, tx);
-    quicksort(&mut v, tx);
+    merge_sort(&mut v, tx);
+    // quicksort(&mut v, tx);
     match rx.recv().unwrap() {
         Some(result) => v = result.values,
         None => {}
@@ -127,7 +127,6 @@ fn view(app: &App, model: &Model, frame: Frame) {
     let bar_width = win.w() / LEN as f32;
 
     let v = &model.v;
-    println!("{:?}", v);
     for i in 0..LEN {
         let bar_height = v[i] as f32 * win.w() / LEN as f32;
         let x = -win.w() / 2.0 + bar_width / 2.0 + i as f32 * bar_width;

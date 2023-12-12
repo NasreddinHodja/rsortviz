@@ -132,7 +132,7 @@ pub fn merge_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
                     values[k] = left[i];
                     tx.send(Some(SortResult {
                         values: values.to_vec(),
-                        used_indices: vec![i, j],
+                        used_indices: vec![i, j, k],
                     }))
                     .unwrap();
                     k += 1;
@@ -141,7 +141,7 @@ pub fn merge_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
                     values[k] = right[j];
                     tx.send(Some(SortResult {
                         values: values.to_vec(),
-                        used_indices: vec![i, j],
+                        used_indices: vec![i, j, k],
                     }))
                     .unwrap();
                     k += 1;
@@ -153,7 +153,7 @@ pub fn merge_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
                 values[k] = left[i];
                 tx.send(Some(SortResult {
                     values: values.to_vec(),
-                    used_indices: vec![i, j],
+                    used_indices: vec![i, j, k],
                 }))
                 .unwrap();
                 k += 1;
@@ -164,7 +164,7 @@ pub fn merge_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
                 values[k] = right[j];
                 tx.send(Some(SortResult {
                     values: values.to_vec(),
-                    used_indices: vec![i, j],
+                    used_indices: vec![i, j, k],
                 }))
                 .unwrap();
                 k += 1;
