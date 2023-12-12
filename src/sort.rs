@@ -87,10 +87,8 @@ pub fn selection_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
     let len = values.len();
 
     for i in 0..len {
-        // Assume the current index is the minimum
         let mut min_index = i;
 
-        // Find the index of the minimum element in the unsorted part
         for j in (i + 1)..len {
             if values[j] < values[min_index] {
                 min_index = j;
@@ -102,7 +100,6 @@ pub fn selection_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
             .unwrap();
         }
 
-        // Swap the found minimum element with the element at index i
         values.swap(i, min_index);
     }
 }
@@ -234,12 +231,10 @@ pub fn heap_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
     }))
     .unwrap();
 
-    // Build a max heap from the values
     for i in (0..values.len() / 2).rev() {
         max_heapify(values, i, values.len(), &tx);
     }
 
-    // Extract elements from the heap one by one
     for end in (1..values.len()).rev() {
         values.swap(0, end);
         max_heapify(values, 0, end, &tx);
@@ -283,4 +278,78 @@ fn max_heapify(values: &mut [usize], i: usize, heap_size: usize, tx: &Sender<Opt
         .unwrap();
         max_heapify(values, largest, heap_size, &tx);
     }
+}
+
+pub fn shell_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
+    let len = values.len();
+    let mut gap = len / 2;
+    tx.send(Some(SortResult {
+        values: values.to_vec(),
+        used_indices: vec![gap],
+    }))
+    .unwrap();
+
+    while gap > 0 {
+        for i in gap..len {
+            let mut j = i;
+            while j >= gap && values[j - gap] > values[j] {
+                values.swap(j - gap, j);
+                j -= gap;
+                tx.send(Some(SortResult {
+                    values: values.to_vec(),
+                    used_indices: vec![gap, i, j],
+                }))
+                .unwrap();
+            }
+        }
+
+        gap /= 2;
+    }
+
+    tx.send(None).unwrap();
+}
+
+pub fn radix_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
+    if values.is_empty() {
+        return;
+    }
+
+    let max_num = *values.iter().max().unwrap();
+    let mut exp = 1;
+
+    while max_num / exp > 0 {
+        counting_sort(values, exp, &tx);
+        exp *= 10;
+    }
+}
+
+fn counting_sort(values: &mut [usize], exp: usize, tx: &Sender<Option<SortResult>>) {
+    let mut output = vec![0; values.len()];
+    let mut count = vec![0; 10];
+
+    for &num in values.iter() {
+        count[(num / exp) % 10] += 1;
+    }
+
+    for i in 1..10 {
+        count[i] += count[i - 1];
+    }
+
+    for &num in values.iter().rev() {
+        let index = (num / exp) % 10;
+        output[count[index] - 1] = num;
+        count[index] -= 1;
+        tx.send(Some(SortResult {
+            values: output.to_vec(),
+            used_indices: vec![index],
+        }))
+        .unwrap();
+    }
+
+    values.copy_from_slice(&output);
+    tx.send(Some(SortResult {
+        values: values.to_vec(),
+        used_indices: vec![],
+    }))
+    .unwrap();
 }
