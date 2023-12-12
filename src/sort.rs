@@ -179,3 +179,48 @@ pub fn merge_sort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
 
     tx.send(None).unwrap();
 }
+
+pub fn quicksort(values: &mut [usize], tx: Sender<Option<SortResult>>) {
+    tx.send(Some(SortResult {
+        values: values.to_vec(),
+        used_indices: vec![],
+    }))
+    .unwrap();
+    let mut stack = vec![(0, values.len())];
+
+    while let Some((lo, hi)) = stack.pop() {
+        if hi - lo <= 1 {
+            continue;
+        }
+        let pivot_index = lo + (hi - lo) / 2;
+        values.swap(pivot_index, hi - 1);
+
+        let pivot = values[hi - 1];
+        let mut i = lo;
+
+        for j in lo..hi - 1 {
+            if values[j] <= pivot {
+                tx.send(Some(SortResult {
+                    values: values.to_vec(),
+                    used_indices: vec![i, j, pivot_index],
+                }))
+                .unwrap();
+                values.swap(i, j);
+                i += 1;
+            }
+        }
+
+        values.swap(i, hi - 1);
+
+        let pivot_index = i;
+
+        stack.push((pivot_index + 1, hi));
+        stack.push((lo, pivot_index));
+    }
+    tx.send(Some(SortResult {
+        values: values.to_vec(),
+        used_indices: vec![],
+    }))
+    .unwrap();
+    tx.send(None).unwrap();
+}

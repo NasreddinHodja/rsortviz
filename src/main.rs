@@ -61,20 +61,24 @@ fn model(app: &App) -> Model {
         .unwrap();
 
     let playing = false;
-    let v: Vec<usize> = (1..=LEN).collect();
-    let mut v = unsort(&v);
+    let values: Vec<usize> = (1..=LEN).collect();
+    let mut v = unsort(&values);
 
     let (tx, rx) = mpsc::channel();
 
     // bubble_sort(&mut v, tx);
     // insertion_sort(&mut v, tx);
-    selection_sort(&mut v, tx);
+    // selection_sort(&mut v, tx);
     // merge_sort(&mut v, tx);
-    stream.pause().unwrap();
+    quicksort(&mut v, tx);
+    match rx.recv().unwrap() {
+        Some(result) => v = result.values,
+        None => {}
+    }
 
     Model {
         playing,
-        v: v,
+        v,
         used_indices: vec![],
         rx,
         stream,
@@ -123,6 +127,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
     let bar_width = win.w() / LEN as f32;
 
     let v = &model.v;
+    println!("{:?}", v);
     for i in 0..LEN {
         let bar_height = v[i] as f32 * win.w() / LEN as f32;
         let x = -win.w() / 2.0 + bar_width / 2.0 + i as f32 * bar_width;
@@ -148,25 +153,4 @@ fn view(app: &App, model: &Model, frame: Frame) {
 
 fn main() {
     nannou::app(model).update(update).event(event).run();
-
-    // let v: Vec<usize> = (1..=LEN).collect();
-
-    // let mut v = unsort(&v);
-    // let end = v.len() - 1;
-    // println!("v = {v:?}\n");
-    // sort::quick_sort(&mut v);
-    // println!("{:?}", v);
-    // let mut sorter = CurrentSorter::new(&v);
-
-    // let mut i = 0;
-    // loop {
-    //     sorter.next_step();
-    //     println!("{i} -> {:?}", sorter.current_state());
-    //     if let Some(step) = sorter.next_step() {
-    //         i += 1;
-    //     } else {
-    //         break;
-    //     }
-    // }
-    // println!("result = {:?}", &sorter.current_state());
 }
