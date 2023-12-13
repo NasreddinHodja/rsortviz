@@ -3,8 +3,10 @@ use nannou_audio as audio;
 use nannou_audio::Buffer;
 use std::sync::mpsc;
 
+mod cli;
 mod sort;
-use sort::*;
+
+use sort::{unsort, SortResult};
 
 const WINDOW_HEIGHT: u32 = 800;
 const WINDOW_WIDTH: u32 = 800;
@@ -12,7 +14,6 @@ const BG_COLOR: Rgb<u8> = BLACK;
 const FG_COLOR: Rgb<u8> = PLUM;
 const FFG_COLOR: Rgb<u8> = RED;
 const MAX_HZ: f64 = 440.0;
-const LEN: usize = 100;
 
 struct Audio {
     phase: f64,
@@ -22,6 +23,7 @@ struct Audio {
 struct Model {
     playing: bool,
     v: Vec<usize>,
+    length: usize,
     used_indices: Vec<usize>,
     rx: mpsc::Receiver<Option<SortResult>>,
     stream: audio::Stream<Audio>,
@@ -46,8 +48,9 @@ fn model(app: &App) -> Model {
         .view(view)
         .build()
         .unwrap();
-
     // app.set_loop_mode(LoopMode::rate_fps(2.0));
+
+    let args = cli::parse();
 
     let audio_host = audio::Host::new();
     let model = Audio {
@@ -61,19 +64,15 @@ fn model(app: &App) -> Model {
         .unwrap();
 
     let playing = false;
-    let values: Vec<usize> = (1..=LEN).collect();
+    let values: Vec<usize> = (1..=args.length).collect();
     let mut v = unsort(&values);
 
-    let (tx, rx) = mpsc::channel();
+    let (tx, rx): (
+        mpsc::Sender<Option<SortResult>>,
+        mpsc::Receiver<Option<SortResult>>,
+    ) = mpsc::channel();
 
-    // bubble_sort(&mut v, tx);
-    // insertion_sort(&mut v, tx);
-    // selection_sort(&mut v, tx);
-    merge_sort(&mut v, tx);
-    // quicksort(&mut v, tx);
-    // heap_sort(&mut v, tx);
-    // shell_sort(&mut v, tx);
-    // radix_sort(&mut v, tx);
+    args.sorter.sort(&mut v, tx);
 
     match rx.recv().unwrap() {
         Some(result) => v = result.values,
@@ -83,6 +82,7 @@ fn model(app: &App) -> Model {
     Model {
         playing,
         v,
+        length: args.length,
         used_indices: vec![],
         rx,
         stream,
@@ -131,18 +131,18 @@ fn view(app: &App, model: &Model, frame: Frame) {
     draw.background().color(BG_COLOR);
 
     let win = app.window_rect();
-    let bar_width = win.w() / LEN as f32;
+    let bar_width = win.w() / model.length as f32;
 
     let v = &model.v;
-    for i in 0..LEN {
-        let bar_height = v[i] as f32 * win.w() / LEN as f32;
+    for i in 0..model.length {
+        let bar_height = v[i] as f32 * win.w() / model.length as f32;
         let x = -win.w() / 2.0 + bar_width / 2.0 + i as f32 * bar_width;
         let y = -win.h() / 2.0 + bar_height / 2.0;
         let draw = draw.rect().x_y(x, y).w_h(bar_width, bar_height);
 
         if model.used_indices.contains(&i) {
             draw.color(FFG_COLOR);
-            let hz = v[i] as f64 * MAX_HZ / LEN as f64;
+            let hz = v[i] as f64 * MAX_HZ / model.length as f64;
             model
                 .stream
                 .send(move |audio| {
