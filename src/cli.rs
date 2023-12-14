@@ -10,10 +10,10 @@ const MAX_LEN: usize = 500;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct CliArgs {
-    #[arg(short, long)]
+    #[arg(short, long, default_value_t = String::from("quick"))]
     algorithm: String,
 
-    #[arg(short, long)]
+    #[arg(short, long, default_value_t = 30)]
     length: usize,
 }
 
