@@ -1,7 +1,7 @@
 use clap::Parser;
 
 use crate::sort::{
-    BubbleSorter, HeapSorter, InsertionSorter, MergeSorter, QuickSorter, RadixSorter,
+    BubbleSorter, GnomeSorter, HeapSorter, InsertionSorter, MergeSorter, QuickSorter, RadixSorter,
     SelectionSorter, ShellSorter, Sorter,
 };
 
@@ -13,7 +13,7 @@ struct CliArgs {
     #[arg(short, long, default_value_t = String::from("quick"))]
     algorithm: String,
 
-    #[arg(short, long, default_value_t = 30)]
+    #[arg(short, long, default_value_t = 50)]
     length: usize,
 }
 
@@ -36,6 +36,7 @@ pub fn parse() -> Args {
         "heap" => Box::new(HeapSorter),
         "shell" => Box::new(ShellSorter),
         "radix" => Box::new(RadixSorter),
+        "gnome" => Box::new(GnomeSorter),
         _ => panic!("Please provide one of the available algorithms."),
     };
 

@@ -1,4 +1,5 @@
 use std::sync::mpsc::Sender;
+
 pub struct BubbleSorter;
 
 use super::{send_message, SortResult, Sorter};

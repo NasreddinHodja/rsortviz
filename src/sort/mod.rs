@@ -31,6 +31,7 @@ fn send_message(tx: &Sender<Option<SortResult>>, values: &[usize], used_indices:
 }
 
 mod bubble;
+mod gnome;
 mod heap;
 mod insertion;
 mod merge;
@@ -39,6 +40,7 @@ mod radix;
 mod selection;
 mod shell;
 pub use bubble::BubbleSorter;
+pub use gnome::GnomeSorter;
 pub use heap::HeapSorter;
 pub use insertion::InsertionSorter;
 pub use merge::MergeSorter;

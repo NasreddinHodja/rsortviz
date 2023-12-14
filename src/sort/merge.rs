@@ -1,4 +1,5 @@
 use std::sync::mpsc::Sender;
+
 pub struct MergeSorter;
 
 use super::{send_message, SortResult, Sorter};
