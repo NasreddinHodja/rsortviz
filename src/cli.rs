@@ -1,8 +1,8 @@
 use clap::Parser;
 
 use crate::sort::{
-    BubbleSorter, GnomeSorter, HeapSorter, InsertionSorter, MergeSorter, QuickSorter, RadixSorter,
-    SelectionSorter, ShellSorter, Sorter,
+    BubbleSorter, CycleSorter, GnomeSorter, HeapSorter, InsertionSorter, MergeSorter, QuickSorter,
+    RadixSorter, SelectionSorter, ShellSorter, Sorter,
 };
 
 const MAX_LEN: usize = 500;
@@ -37,6 +37,7 @@ pub fn parse() -> Args {
         "shell" => Box::new(ShellSorter),
         "radix" => Box::new(RadixSorter),
         "gnome" => Box::new(GnomeSorter),
+        "cycle" => Box::new(CycleSorter),
         _ => panic!("Please provide one of the available algorithms."),
     };
 
