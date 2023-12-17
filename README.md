@@ -2,7 +2,7 @@
 
 A visualizer for sorting algorithms in [Rust](https://www.rust-lang.org/) using [nanou](https://nannou.cc/).
 
-![quicksort](https://i.imgur.com/MBGy8V4.gifv)
+![quicksort](https://i.imgur.com/MBGy8V4.gif)
 
 ## Algorithms
 
