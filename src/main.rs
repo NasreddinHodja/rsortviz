@@ -43,14 +43,14 @@ fn audio(audio: &mut Audio, buffer: &mut Buffer) {
 }
 
 fn model(app: &App) -> Model {
+    let args = cli::parse();
+
     app.new_window()
         .size_pixels(WINDOW_WIDTH, WINDOW_HEIGHT)
         .view(view)
         .build()
         .unwrap();
     // app.set_loop_mode(LoopMode::rate_fps(2.0));
-
-    let args = cli::parse();
 
     let audio_host = audio::Host::new();
     let model = Audio {

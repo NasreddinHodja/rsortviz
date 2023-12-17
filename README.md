@@ -16,3 +16,26 @@ A visualizer for sorting algorithms in [Rust](https://www.rust-lang.org/) using 
 - [x] [radix sort (with counting sort)](https://en.wikipedia.org/wiki/Radix_sort)
 - [x] [gnome sort](https://en.wikipedia.org/wiki/Gnome_sort)
 - [x] [cycle sort](https://en.wikipedia.org/wiki/Cycle_sort)
+
+## Usage
+
+```
+Options:
+  -a, --algorithm <ALGORITHM>  [default: quick]
+  -l, --length <LENGTH>        [default: 50]
+  -h, --help                   Print help
+  -V, --version                Print version
+```
+
+Possible value for `<ALGORIGTHM>` are:
+
+- `bubble`
+- `insertion`
+- `selection`
+- `merge`
+- `quick`
+- `heap`
+- `shell`
+- `radix`
+- `gnome`
+- `cycle`
