@@ -1,8 +1,8 @@
 # rsortviz
 
-A visualizer for sorting algorithms in [Rust](https://www.rust-lang.org/) using [nanou](https://nannou.cc/).
+A visualizer for sorting algorithms in [Rust](https://www.rust-lang.org/) using [nannou](https://nannou.cc/).
 
-![quicksort](https://i.imgur.com/MBGy8V4.gif)
+![quicksort](https://i.imgur.com/p9khfo2.gif)
 
 ## Algorithms
 
