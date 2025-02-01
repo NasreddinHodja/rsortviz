@@ -44,7 +44,7 @@ impl Scale {
         Self { frequencies }
     }
 
-    pub fn frequencies(&self) -> &Vec<f64> {
+    pub fn frequencies(&self) -> &[f64] {
         &self.frequencies
     }
 
