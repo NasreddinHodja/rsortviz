@@ -50,6 +50,6 @@ impl Scale {
 
     pub fn frequency(&self, index: usize) -> f64 {
         assert!(index < self.frequencies.len());
-        self.frequencies()[index]
+        self.frequencies[index]
     }
 }
