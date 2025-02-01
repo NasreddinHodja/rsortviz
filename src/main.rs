@@ -5,8 +5,10 @@ use std::sync::mpsc;
 
 mod cli;
 mod sort;
+mod sound;
 
 use sort::{unsort, SortResult};
+use sound::Scale;
 
 const WINDOW_HEIGHT: u32 = 800;
 const WINDOW_WIDTH: u32 = 800;
@@ -27,6 +29,7 @@ struct Model {
     used_indices: Vec<usize>,
     rx: mpsc::Receiver<Option<SortResult>>,
     stream: audio::Stream<Audio>,
+    scale: Option<Scale>,
 }
 
 fn audio(audio: &mut Audio, buffer: &mut Buffer) {
@@ -63,8 +66,13 @@ fn model(app: &App) -> Model {
         .build()
         .unwrap();
 
+    let scale: Option<Scale> = args.scale;
+
     let playing = false;
-    let values: Vec<usize> = (1..=args.length).collect();
+    let mut values: Vec<usize> = (1..=args.length).collect();
+    if let Some(s) = &scale {
+        values = (1..=s.frequencies().len()).collect();
+    }
     let mut v = unsort(&values);
 
     let (tx, rx): (
@@ -79,13 +87,19 @@ fn model(app: &App) -> Model {
         None => {}
     }
 
+    let mut length = args.length;
+    if let Some(s) = &scale {
+        length = s.frequencies().len();
+    }
+
     Model {
         playing,
         v,
-        length: args.length,
+        length,
         used_indices: vec![],
         rx,
         stream,
+        scale,
     }
 }
 
@@ -142,7 +156,10 @@ fn view(app: &App, model: &Model, frame: Frame) {
 
         if model.used_indices.contains(&i) {
             draw.color(FFG_COLOR);
-            let hz = v[i] as f64 * MAX_HZ / model.length as f64;
+            let mut hz = v[i] as f64 * MAX_HZ / model.length as f64;
+            if let Some(scale) = &model.scale {
+                hz = scale.frequency(i);
+            }
             model
                 .stream
                 .send(move |audio| {
@@ -159,4 +176,8 @@ fn view(app: &App, model: &Model, frame: Frame) {
 
 fn main() {
     nannou::app(model).update(update).event(event).run();
+    // let floor = 261.63;
+    // let ceil = 523.25;
+    // let minor = MinorScale::new(floor, ceil);
+    // println!("{:?}", minor);
 }
