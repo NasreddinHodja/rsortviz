@@ -35,6 +35,7 @@ impl Sorter for QuickSorter {
             stack.push((low, pivot_index));
         }
 
+        self.scan(values, &tx);
         send_message(&tx, values, &[]);
         tx.send(None).unwrap();
     }

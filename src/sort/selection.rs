@@ -21,5 +21,9 @@ impl Sorter for SelectionSorter {
 
             values.swap(i, min_index);
         }
+
+        self.scan(values, &tx);
+        send_message(&tx, values, &[]);
+        tx.send(None).unwrap();
     }
 }

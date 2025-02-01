@@ -20,6 +20,8 @@ impl Sorter for GnomeSorter {
             send_message(&tx, values, &[pos]);
         }
 
+        self.scan(values, &tx);
         send_message(&tx, values, &[]);
+        tx.send(None).unwrap();
     }
 }

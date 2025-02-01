@@ -19,6 +19,8 @@ impl Sorter for InsertionSorter {
             }
         }
 
+        self.scan(values, &tx);
+        send_message(&tx, values, &[]);
         tx.send(None).unwrap();
     }
 }

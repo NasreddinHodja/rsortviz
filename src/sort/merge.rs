@@ -14,6 +14,10 @@ impl Sorter for MergeSorter {
         let mut temp = values.to_vec();
 
         self.merge_sort(values, &mut temp, 0, len - 1, &tx);
+
+        self.scan(values, &tx);
+        send_message(&tx, values, &[]);
+        tx.send(None).unwrap();
     }
 }
 

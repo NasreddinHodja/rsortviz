@@ -23,6 +23,8 @@ impl Sorter for ShellSorter {
             gap /= 2;
         }
 
+        self.scan(values, &tx);
+        send_message(&tx, values, &[]);
         tx.send(None).unwrap();
     }
 }

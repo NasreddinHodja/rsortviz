@@ -17,6 +17,10 @@ impl Sorter for RadixSorter {
             self.counting_sort(values, exp, &tx);
             exp *= 10;
         }
+
+        self.scan(values, &tx);
+        send_message(&tx, values, &[]);
+        tx.send(None).unwrap();
     }
 }
 

@@ -8,6 +8,11 @@ pub struct SortResult {
 
 pub trait Sorter {
     fn sort(&self, values: &mut [usize], tx: Sender<Option<SortResult>>);
+    fn scan(&self, values: &mut [usize], tx: &Sender<Option<SortResult>>) {
+        for i in 0..values.len() {
+            send_message(tx, values, &[i]);
+        }
+    }
 }
 
 pub fn unsort(values: &[usize]) -> Vec<usize> {

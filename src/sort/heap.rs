@@ -17,6 +17,10 @@ impl Sorter for HeapSorter {
             self.max_heapify(values, 0, end, &tx);
             send_message(&tx, values, &[end]);
         }
+
+        self.scan(values, &tx);
+        send_message(&tx, values, &[]);
+        tx.send(None).unwrap();
     }
 }
 

@@ -53,6 +53,8 @@ impl Sorter for CycleSorter {
             }
         }
 
+        self.scan(values, &tx);
         send_message(&tx, values, &[]);
+        tx.send(None).unwrap();
     }
 }
